@@ -19,7 +19,7 @@ todo_list = []
 
 command_prefixes = ('homie ', '!')
 
-bot = commands.Bot(command_prefix=command_prefixes, case_insensitive=True)
+bot = commands.Bot(command_prefix=command_prefixes, case_insensitive=True, help_command=None)
 
 @bot.event
 async def on_message(message):
@@ -72,6 +72,21 @@ async def on_reaction_add(reaction, user):
             await reaction.message.add_reaction('🎉')
             await reaction.message.channel.send(("Congrats on finishing " + 
             todo_item + "!!!"))
+
+@bot.command(name='info', aliases=['help', 'commands'])
+async def await_info(ctx):
+    desc = 'Command prefixes (homie or !) are optional ' \
+        'on commands: solve, ask, and add todo. It is mandatory on all other commands.'
+    embed = discord.Embed(title='Homie W. Commands', description=desc)
+
+    embed.add_field(name='solve [equation]', value='Solve a math equation')
+    embed.add_field(name='ask [question]', value='Ask any question')
+    embed.add_field(name='todo', value='Display TODO List')
+    embed.add_field(name='add todo [todo list item]', value='Add an item to the TODO List')
+    embed.add_field(name='timer [seconds] [minutes] [hours] [days]', value='Set a timer')
+
+    embed.set_footer(text='Have a nice day!')
+    await ctx.send(embed=embed)
 
 @bot.command(name = "timer")
 async def timer(ctx, seconds: float, minutes: float=0, hours: float=0, days : float=0):
