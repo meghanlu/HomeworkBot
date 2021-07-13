@@ -2,6 +2,9 @@ from discord.ext import commands
 from mathjspy import MathJS
 import re
 import wolframalpha
+import datetime
+import discord
+
 
 appid = ""
 
@@ -47,7 +50,7 @@ async def on_message(message):
             res = wa_client.query(message.content[len("ask"):])
             answer = next(res.results).text
         await message.channel.send(answer)
-        
+
     elif content_without_prefix.lower().startswith("add todo"):
         # Add to todo list
         todo_list.append(message.content[len("add todo"):])
@@ -70,8 +73,41 @@ async def on_reaction_add(reaction, user):
             await reaction.message.channel.send(("Congrats on finishing " + 
             todo_item + "!!!"))
 
+@bot.command(name = "timer")
+async def timer(ctx, seconds: float, minutes: float=0, hours: float=0, days : float=0):
+    target = (datetime.datetime.now() + datetime.timedelta(days=days, 
+    seconds=seconds, minutes=minutes, hours=hours))
+
+    timer_embed = discord.Embed(
+        title = "Timer",
+        description = "Description"
+    )
+    
+    timer_embed.add_field(
+        name = "Time Left:",
+        value = str(1)
+    )
+
+    timer_embed_message = await ctx.send(embed=timer_embed)
+
+    while datetime.datetime.now() < target:
+        time_left = target - datetime.datetime.now()
+        timer_embed.remove_field(0)
+        timer_embed.add_field(
+            name = "Time Left:",
+            value = str(time_left)
+        )
+        await timer_embed_message.edit(embed=timer_embed)
+    
+    await ctx.send("Your timer is up!!", mention_author=True)
+    await ctx.send(minutes)
+
 def make_codeblock(string : str):
     return "`" + string + "`"
+
+def remove_prefix(string:str, prefix:str):
+    if string.startswith(prefix):
+        return string[len(prefix):]
 
 with open("BOT_TOKEN.txt", "r") as token_file:
     TOKEN = token_file.read()
