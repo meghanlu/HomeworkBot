@@ -73,6 +73,15 @@ async def on_reaction_add(reaction, user):
             await reaction.message.channel.send(("Congrats on finishing " + 
             todo_item + "!!!"))
 
+@bot.command(name = "todo")
+async def todo(ctx):
+    if not todo_list:
+        await ctx.send("There is nothing on your todo list!")
+    else:
+        for num, item in enumerate(todo_list, 1):
+            await ctx.send(make_codeblock(str(num) + ". " + item))
+        await ctx.send(make_codeblock("React to check off a task!"))
+
 @bot.command(name='info', aliases=['help', 'commands'])
 async def await_info(ctx):
     desc = 'Command prefixes (homie or !) are optional ' \
