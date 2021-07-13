@@ -14,7 +14,9 @@ mjs = MathJS()
 
 todo_list = []
 
-bot = commands.Bot(command_prefix=('homie ', '!'), case_insensitive=True)
+command_prefixes = ('homie ', '!')
+
+bot = commands.Bot(command_prefix=command_prefixes, case_insensitive=True)
 
 @bot.event
 async def on_message(message):
@@ -26,17 +28,30 @@ async def on_message(message):
             await message.add_reaction('✅')
         return
 
-    if message.content.lower().startswith("solve"):
+    content_without_prefix = message.content
+
+    for command_prefix in command_prefixes:
+        # Remove command prefix if applicable
+        if content_without_prefix.lower().startswith(command_prefix):
+            content_without_prefix = remove_prefix(message.content, command_prefix)
+            break
+
+    if content_without_prefix.lower().startswith("solve"):
         try:
             await message.channel.send(mjs.eval(message.content[len("solve"):]))
         except:
             await message.channel.send("Sorry, we could not compute.")
 
-    elif message.content.lower().startswith("ask"):
+    elif content_without_prefix.lower().startswith("ask"):
         async with message.channel.typing():
             res = wa_client.query(message.content[len("ask"):])
             answer = next(res.results).text
         await message.channel.send(answer)
+        
+    elif content_without_prefix.lower().startswith("add todo"):
+        # Add to todo list
+        todo_list.append(message.content[len("add todo"):])
+        message.content = "!todo"
 
     await bot.process_commands(message)
 
