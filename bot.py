@@ -5,7 +5,6 @@ import wolframalpha
 import datetime
 import discord
 
-
 appid = ""
 
 with open("WA_APPID.txt", "r") as appid_file:
@@ -40,12 +39,14 @@ async def on_message(message):
             break
 
     if content_without_prefix.lower().startswith("solve"):
+        # Evaluate with mathjspy library
         try:
             await message.channel.send(mjs.eval(message.content[len("solve"):]))
         except:
             await message.channel.send("Sorry, we could not compute.")
 
     elif content_without_prefix.lower().startswith("ask"):
+        # Query with wolframalpha library 
         async with message.channel.typing():
             res = wa_client.query(message.content[len("ask"):])
             answer = next(res.results).text
@@ -62,7 +63,6 @@ async def on_message(message):
 async def on_reaction_add(reaction, user):
     if user.bot:
         return
-    
     if reaction.emoji == '✅' and  reaction.message.author == bot.user:
         # If someone checked something off of the todo list
         todo_item = re.sub('^`\d+\.\s', '', reaction.message.content)
@@ -94,8 +94,7 @@ async def timer(ctx, seconds: float, minutes: float=0, hours: float=0, days : fl
     seconds=seconds, minutes=minutes, hours=hours))
 
     timer_embed = discord.Embed(
-        title = "Timer",
-        description = "Description"
+        title = "Timer"
     )
     
     timer_embed.add_field(
